@@ -133,6 +133,56 @@ class player():
         # set time the player spends in jail
         self.jail_time = t
 
+    def buyStreet(self, id):
+        # get data of the street
+        street = getStreetByID(self,id:int)
+        # if street is not buyable, tell the player
+        if not street.type in ["facility","street"]:
+            print("Field is not buyable.")
+            return
+        # check if player is able to afford street
+        if player.currency < street.cost:
+            print(f"Player can't afford {street.name}!")
+            return
+        # the json dict of the date for the street attached to the user
+        userAddedStreetData = {
+            "id": street.id,
+            "houses": 0,
+            "hotels": 0,
+            "current_rent": 0
+        }
+        # add data to player
+        self.streets.append(userAddedStreetData)
+        # remove player money
+        self.currency -= street.cost
+
+    def buyHotel(self,id:int, hotel_limit:int=1):
+        # get street data
+        street = getStreetByID(id)
+        # check if street is street or facility
+        if not street.type in ["facility","street"]:
+            print(f"Can not buy hotels for {street.type}.")
+        # check if player owns street
+        index = -1
+        for i in range(len(self.streets)):
+            if self.streets[i].id == id:
+                index = i
+        # check if plyer owns street
+        if index == -1:
+            print(f"You do not own the {street.type} {street.name}.")
+            return
+        # check if player has enough money
+        if street.hotel_cost > self.currency:
+            print(f"Can not afford hotel for {street.name}")
+        # check if player already has to many hotels
+        if self.streets[index]["hotels"] >= hotel_limit:
+            print(f"Can not buy more hotels than {hotel_limit}.")
+            return
+        # buy hotel
+        self.streets[index]["hotels"] += 1
+        # remove money from player
+        self.currency -= street.hotel_cost
+            
     # convert the player object to a json object
     def dump(self):
         playerData = {
@@ -546,6 +596,10 @@ class monopoly():
     
     def updatePlayer(self, playero:player):
         self.players["player_data"][playero.id] = playero.dump()
+
+    # Get the owner of a street, returns player or none if the street has no owner
+    def getStreetOwner(self, id):
+        street = self.getSreetByID(id)
 
     ##
     # converts a string to instruction

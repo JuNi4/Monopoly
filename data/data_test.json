@@ -46,7 +46,7 @@
     ],
     "chance": [
         {"text": "Go To Jail", "actions": "goto_jail|arrest"}
-    ]
+    ],
     "community_chest": [
         {"text": ""}
     ]
