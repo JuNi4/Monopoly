@@ -156,7 +156,7 @@ class player():
         # remove player money
         self.currency -= street.cost
 
-    def buyHotel(self,id:int, hotel_limit:int=1):
+    def buyHotel(self,id:int, hotel_limit:int=1,house_requiremen:int=4,rm_houses:bool=True):
         # get street data
         street = getStreetByID(id)
         # check if street is street or facility
@@ -182,7 +182,34 @@ class player():
         self.streets[index]["hotels"] += 1
         # remove money from player
         self.currency -= street.hotel_cost
-            
+
+    def buyHouse(self,id:int, house_limit:int=1):
+        # get street data
+        street = getStreetByID(id)
+        # check if street is street or facility
+        if not street.type in ["facility","street"]:
+            print(f"Can not buy hotels for {street.type}.")
+        # check if player owns street
+        index = -1
+        for i in range(len(self.streets)):
+            if self.streets[i].id == id:
+                index = i
+        # check if plyer owns street
+        if index == -1:
+            print(f"You do not own the {street.type} {street.name}.")
+            return
+        # check if player has enough money
+        if street.hotel_cost > self.currency:
+            print(f"Can not afford hotel for {street.name}")
+        # check if player already has to many hotels
+        if self.streets[index]["hotels"] >= hotel_limit:
+            print(f"Can not buy more hotels than {hotel_limit}.")
+            return
+        # buy hotel
+        self.streets[index]["hotels"] += 1
+        # remove money from player
+        self.currency -= street.hotel_cost
+        
     # convert the player object to a json object
     def dump(self):
         playerData = {
