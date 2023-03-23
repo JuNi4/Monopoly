@@ -164,7 +164,8 @@ while True:
         # move the player
         x = player.move(y)
         if x == 1:
-            print(color.r+"You went over GO and collected 200"+game.currencySymbol)
+            print(color.r+f"You went over GO and collected {game.salery}{game.currencySymbol}.")
+            player.giveCurrency(game.salery)
             time.sleep(1)
     # if the player is in jail
     else:
@@ -224,24 +225,132 @@ while True:
         game.drawCards([player.position], 25)
     # otherwise just tell the player the name
     else:
-        if player.is_ai:
-            print(color.r + f"You landed on {game.getStreetByID(player.position).name}.")
-        else:
-            print(color.r + f"You landed on {game.getStreetByID(player.position).name}. Press <ENTER> to continue.")
-    # wait if player is ai or wait for enter to be pressed
-    if player.is_ai:
-        time.sleep(2)
-    else:
-        input()
+        print(color.r + f"You landed on {game.getStreetByID(player.position).name}.")
 
     # Evaluate current position of the player
     result = game.evalPosition(player)
-    time.sleep(2)
 
-    # present the player or ai the options and let them choose
+    # add bankrupt and end turn options
+    result.append({"type":"end_turn"})
+    result.append({"type":"declare_bankrupcy"})
+
+    # get street
+    street = game.getStreetByID(player.position)
+
+    done = True
+
+    if not result == None:
+        if result[0]["type"] == "pay_rent":
+            # tell the player that he payed rent to a player
+            if player.is_ai:
+                print(result[0]["msg"])
+                time.sleep(1)
+            else:
+                print(color.r+result[0]["msg"]+" Press <ENTER> to continue.")
+                input()
+
+    while done:
+        os.system("clear")
+        # print turn data
+        print(color.rgb(0,0,0)+f"Turn: {turn} Player:{index+1}/{game.totalPlayers}")
+        
+        # Draw the updated minimap
+        game.drawMiniMap([player.position],[player.color])
+
+        # draw the card if it comes with a deed
+        if game.getStreetByID(player.position).type in ["facility","street"]:
+            print(color.r + "You landed on:")
+            game.drawCards([player.position], 25)
+        # otherwise just tell the player the name
+        else:
+            print(color.r + f"You landed on {game.getStreetByID(player.position).name}.")
+        # print the balance of the player
+        print(color.r+f"Balance: {player.currency}{game.currencySymbol}")
+        # present the player or ai the options and let them choose
+        if result != None:
+            for i in range(len(result)):
+                if result[i]["type"] == "offer_street":
+                    # set color for buy option
+                    Color = color.rgb(50,50,50)
+                    # check if player is able to afford street
+                    if player.currency >= street.cost and game.getStreetOwner(street.id)[0] == None:
+                        Color = color.r
+                    print(Color+f"({i}) Buy '{street.name}' for {street.cost}{game.currencySymbol}")
+                # end turn
+                elif result[i]["type"] == "end_turn":
+                    print(color.r+f"({i}) End Turn")
+                # declare bankrupt
+                elif result[i]["type"] == "declare_bankrupcy":
+                    print(color.r+f"({i}) Declare Bankrupcy")
+        else:
+            break
+
+        # ask for input
+        if player.is_human:
+            x = input(">")
+            try:
+                x = int(x)
+            except:
+                print(f"{x} is not a valid number.")
+                time.sleep(1)
+                continue
+        else:
+            time.sleep(1)
+            x = random.randrange(0,len(result)-1)
+            print(">"+str(x))
+        
+        # check if input is out of range
+        if not ( 0 >= x or x < len(result) ):
+            print(f"{x} is not a valid input.")
+            time.sleep(1)
+            continue
+
+        if result[x]["type"] == "end_turn":
+            if player.is_ai:
+                print("End of your turn.")
+                time.sleep(1)
+            else:
+                print("End of your turn. Press <ENTER> to continue.")
+                input()
+            break
+        elif result[x]["type"] == "declare_bankrupcy":
+            # tell the player about what he did
+            if player.is_ai:
+                print("You declared bankrupcy and are now game over.")
+                # wait a moment for him to read
+                time.sleep(1)
+            else:
+                print("You declared bankrupcy and are now game over. Press <ENTER> to continue.")
+                input()
+            # game over the player
+            game.gameOver(player)
+            # make sure no errors appear
+            index -= 1
+            # break out of loop
+            break
+        elif result[x]["type"] == "offer_street":
+            # check if no one already has the street
+            if not game.getStreetOwner(street.id)[0] == None:
+                if player.is_ai:
+                    print("Someone already owns this street.")
+                    time.sleep(1)
+                else:
+                    print("Someone already owns this street. Press <ENTER> to continue")
+                    input()
+                continue
+            # buy street
+            player.buyStreet(street.id, game.streets["streets"])
+            
+            if player.is_ai:
+                print(f"You bought {street.name} for {street.cost}.")
+                time.sleep(1)
+            else:
+                print(f"You bought {street.name} for {street.cost}. Press <ENTER> to continue.")
+                input()
+            continue
 
 
-
+    game.updatePlayer(player)
 
 
 
