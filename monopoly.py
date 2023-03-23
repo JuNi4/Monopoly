@@ -639,9 +639,9 @@ class monopoly():
     def getStreetOwner(self, id):
         # go through all players and find one who owns the street
         for i in range(len(self.players["player_data"])):
-            for o2 in self.players["player_data"][o]["streets_owned"]:
-                if o2["id"] == id:
-                    return getPlayerByID(i)
+            for i2 in range(len(self.players["player_data"][o]["streets_owned"])):
+                if self.players["player_data"][o]["streets_owned"]["id"] == id:
+                    return getPlayerByID(i), i2
         return None
 
     # takes player a's money and gives it to player b
@@ -747,16 +747,19 @@ class monopoly():
     # evaluate a position
     def evalPosition(self,p:player):
         # get street
-        streeto = getStreetByID(p.postion)
+        streeto = self.getStreetByID(p.position)
         # get street owner
-        streetOwner = getStreetOwner(streeto.id)
+        streetOwner, index = self.getStreetOwner(streeto.id)
         # check if field is street
         if streeto.type == "street":
             # check if it is owned by another player
             if streetOwner != None and streetOwner.id != p.id:
                 # pay player rent
-                p.pay
-                
+                self.pay(p, streetOwner, streetOwner.streets[index]["rent"])
+                return {"type":"pay_rent","amount":streetOwner.streets[index]["rent"],"msg":f"Payed {streetOwner.streets[index]['rent']} in rent to {streetOwner.name}"}
+            # check if no one owns the street
+            if streetOwner == None:
+                return {"type":"offer_street","id":streeto.id}
         # compile the action
         #x = self.__compile_action("move_8|goto_jail|no_salery",[0,0], "demo")
         # execute the compiled action
