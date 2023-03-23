@@ -110,6 +110,10 @@ class player():
     def giveCurrency(self,amount:float):
         self.currency += amount
 
+    def chargeCurrency(self,a:float):
+        # remove amount from currency
+        self.currency -= a
+
     # move the player x amount
     def move(self, steps:int):
         code = 0
@@ -135,7 +139,7 @@ class player():
 
     def buyStreet(self, id):
         # get data of the street
-        street = getStreetByID(self,id:int)
+        street = getStreetByID(id)
         # if street is not buyable, tell the player
         if not street.type in ["facility","street"]:
             print("Field is not buyable.")
@@ -160,8 +164,8 @@ class player():
         # get street data
         street = getStreetByID(id)
         # check if street is street or facility
-        if not street.type in ["facility","street"]:
-            print(f"Can not buy hotels for {street.type}.")
+        if not street.type in ["street"]:
+            print(f"Can not buy hotels for a {street.type}.")
         # check if player owns street
         index = -1
         for i in range(len(self.streets)):
@@ -170,6 +174,13 @@ class player():
         # check if plyer owns street
         if index == -1:
             print(f"You do not own the {street.type} {street.name}.")
+            return
+        # check if player owns all streets of the color
+        if False:
+            print("You do not own all streets of the same color.")
+        # check if player has enough houses to upgrade hotel
+        if not self.street[index]["houses"] >= house_requirement:
+            print("You do not have enough houses to upgrade to a hotel.")
             return
         # check if player has enough money
         if street.hotel_cost > self.currency:
@@ -183,12 +194,12 @@ class player():
         # remove money from player
         self.currency -= street.hotel_cost
 
-    def buyHouse(self,id:int, house_limit:int=1):
+    def buyHouse(self,id:int, house_limit:int=1,hotel_limit=1):
         # get street data
         street = getStreetByID(id)
         # check if street is street or facility
-        if not street.type in ["facility","street"]:
-            print(f"Can not buy hotels for {street.type}.")
+        if not street.type in ["street"]:
+            print(f"Can not buy houses for a {street.type}.")
         # check if player owns street
         index = -1
         for i in range(len(self.streets)):
@@ -200,13 +211,13 @@ class player():
             return
         # check if player has enough money
         if street.hotel_cost > self.currency:
-            print(f"Can not afford hotel for {street.name}")
+            print(f"Can not afford house for {street.name}")
         # check if player already has to many hotels
-        if self.streets[index]["hotels"] >= hotel_limit:
-            print(f"Can not buy more hotels than {hotel_limit}.")
+        if self.streets[index]["houses"] >= hotel_limit:
+            print(f"Can not buy more houses than {house_limit}.")
             return
         # buy hotel
-        self.streets[index]["hotels"] += 1
+        self.streets[index]["houses"] += 1
         # remove money from player
         self.currency -= street.hotel_cost
         
@@ -626,7 +637,23 @@ class monopoly():
 
     # Get the owner of a street, returns player or none if the street has no owner
     def getStreetOwner(self, id):
-        street = self.getSreetByID(id)
+        # go through all players and find one who owns the street
+        for i in range(len(self.players["player_data"])):
+            for o2 in self.players["player_data"][o]["streets_owned"]:
+                if o2["id"] == id:
+                    return getPlayerByID(i)
+        return None
+
+    # takes player a's money and gives it to player b
+    def pay(self,pa:player, pb:player, a:float):
+        # add currency to another player
+        pa.currency -= a
+        pb.giveCurrency(a)
+        # update players
+        self.updatePlayer(pa)
+        self.updatePlayer(pb)
+        # return player a
+        return pa
 
     ##
     # converts a string to instruction
@@ -719,9 +746,18 @@ class monopoly():
 
     # evaluate a position
     def evalPosition(self,p:player):
-
-        
+        # get street
+        streeto = getStreetByID(p.postion)
+        # get street owner
+        streetOwner = getStreetOwner(streeto.id)
+        # check if field is street
+        if streeto.type == "street":
+            # check if it is owned by another player
+            if streetOwner != None and streetOwner.id != p.id:
+                # pay player rent
+                p.pay
+                
         # compile the action
-        x = self.__compile_action("move_8|goto_jail|no_salery",[0,0], "demo")
+        #x = self.__compile_action("move_8|goto_jail|no_salery",[0,0], "demo")
         # execute the compiled action
-        self.__execute_action(x,p)
+        #self.__execute_action(x,p)
