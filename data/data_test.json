@@ -1,5 +1,7 @@
 {
     "currency_symbol": "$",
+    "hotel_name": "Hotel",
+    "house_name": "House",
     "streets": [
         {"name":"Jail", "id": 10, "symbol": " ","color":[175,175,175], "color2":[175,175,175],"type":"jail"},
         {"name":"Pall Mall", "id": 11, "symbol": " ","color":[170,59,128], "color2":[255,255,255],"type":"street","cost":200,"house_cost":200,"hotel_cost":200,"rent":[10,50,100,200,300,500]},
@@ -41,5 +43,11 @@
         {"name":"Oxford Street", "id": 32, "symbol": " ","color":[65,135,63], "color2":[255,255,255],"type":"street","cost":200,"house_cost":200,"hotel_cost":200,"rent":[10,50,100,200,300,500]},
         {"name":"Regent Street", "id": 31, "symbol": " ","color":[95,165,93], "color2":[255,255,255],"type":"street","cost":200,"house_cost":200,"hotel_cost":200,"rent":[10,50,100,200,300,500]},
         {"name":"Go To Jail", "id": 30, "symbol": " ","color":[175,175,175], "color2":[175,175,175],"type":"goto_jail","action":"arrest|goto_jail"}
+    ],
+    "chance": [
+        {"text": "Go To Jail", "actions": "goto_jail|arrest"}
+    ]
+    "community_chest": [
+        {"text": ""}
     ]
 }
