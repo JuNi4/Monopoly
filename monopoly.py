@@ -522,44 +522,44 @@ class monopoly():
                 text = "Default"
                 rent = str(streeto.rent[0]) + self.currencySymbol
                 length = mid-len(text + rent)
-                rows[5] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                rows[5] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
                 # rent with one house
                 text = "1 House"
                 rent = str(streeto.rent[1]) + self.currencySymbol
                 length = mid-len(text + rent)
-                rows[6] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                rows[6] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
                 # rent with 2 house
                 text = "2 Houses"
                 rent = str(streeto.rent[2]) + self.currencySymbol
                 length = mid-len(text + rent)
-                rows[7] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                rows[7] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
                 # rent with 3 house
                 text = "3 Houses"
                 rent = str(streeto.rent[3]) + self.currencySymbol
                 length = mid-len(text + rent)
-                rows[8] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                rows[8] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
                 # rent with 4 house
                 text = "4 Houses"
                 rent = str(streeto.rent[4]) + self.currencySymbol
                 length = mid-len(text + rent)
-                rows[9] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                rows[9] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
                 # rent with one hotel
                 text = "Hotel"
                 rent = str(streeto.rent[5]) + self.currencySymbol
                 length = mid-len(text + rent)
-                rows[10] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                rows[10] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
                 # blank row
                 rows[11] += " " + deco + Color2 + symbol2*width_of_card + deco
                 # cost house
                 text = "Cost House"
                 cost = str(streeto.house_cost) + self.currencySymbol
                 length = mid-len(text + cost)
-                rows[12] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + cost + Color2 + symbol2*border + deco
+                rows[12] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + cost + Color2 + symbol2*border + deco
                 # cost hotel
                 text = "Cost Hotel"
                 cost = str(streeto.hotel_cost) + self.currencySymbol
                 length = mid-len(text + cost)
-                rows[13] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + cost + Color2 + symbol2*border + deco
+                rows[13] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + cost + Color2 + symbol2*border + deco
                 # blank row
                 rows[14] += " " + deco + Color2 + symbol2*width_of_card + deco
             elif streeto.type == "facility":
@@ -569,12 +569,12 @@ class monopoly():
                 text = "Default"
                 rent = str(streeto.rent[0]) + self.currencySymbol
                 length = mid-len(text + rent)
-                rows[6] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                rows[6] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
                 # rent with 4 house
                 text = "2 Facilitys"
                 rent = str(streeto.rent[0]*2) + self.currencySymbol
                 length = mid-len(text + rent)
-                rows[7] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                rows[7] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
                 # blank rows
                 for i in range(8,14):
                     rows[i] += " " + deco + Color2 + symbol2*width_of_card + deco
@@ -725,7 +725,7 @@ class monopoly():
         s = self.getStreetByID(id)
         # check if player owns street
         index = -1
-        for i in range(len(self.streets)):
+        for i in range(len(p.streets)):
             if p.streets[i].id == id:
                 index = i
         # check if plyer owns street
@@ -762,7 +762,7 @@ class monopoly():
         s = self.getStreetByID(id)
         # check if player owns street
         index = -1
-        for i in range(len(self.streets)):
+        for i in range(len(p.streets)):
             if p.streets[i].id == id:
                 index = i
         # check if plyer owns street
