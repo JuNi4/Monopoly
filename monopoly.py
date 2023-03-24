@@ -328,6 +328,14 @@ class monopoly():
         # get the amount of currency you get when going over start
         self.salery = self.getStreetByType("start").salery
 
+        # set house and hotel names
+        self.house_name = self.streets["house_name"]
+        self.hotel_name = self.streets["hotel_name"]
+
+        # commnity chest and chance cards
+        self.chest_cards = self.streets["community_chest"]
+        self.chance_cards = self.streets["chance"]
+
         # index all the street color ids
         self.color_index = []
 
