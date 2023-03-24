@@ -1,5 +1,10 @@
 import monopoly as mon, time, color, random, os, linecache
 import itertools
+# Todo:
+# make houses buyable
+# same for hotels
+# finish card display
+# add detection for having all cards of one color
 
 # get path to current file
 PATH = os.path.dirname(os.path.abspath(__file__))
@@ -236,10 +241,10 @@ while True:
         else:
             # inform the player how long to wait
             if player.is_ai:
-                print(color.r+f"You didnt roll a double. You need to wait {player.prison_time} turns.")
+                print(color.r+f"You didnt roll a double. You need to wait {player.prison_time} more turns.")
                 time.sleep(1)
             else:
-                print(color.r+f"You didnt roll a double. You need to wait {player.prison_time} turns. Press <ENTER> to continue.")
+                print(color.r+f"You didnt roll a double. You need to wait {player.prison_time} more turns. Press <ENTER> to continue.")
                 input()
             # increment player index
             index += 1
@@ -295,10 +300,10 @@ while True:
         if result[0]["type"] == "pay_rent":
             # tell the player that he payed rent to a player
             if player.is_ai:
-                print(result[0]["msg"])
+                print(color.r + result[0]["msg"])
                 time.sleep(1)
             else:
-                print(color.r+result[0]["msg"]+" Press <ENTER> to continue.")
+                print(color.r + result[0]["msg"]+" Press <ENTER> to continue.")
                 input()
 
             result.pop(0)

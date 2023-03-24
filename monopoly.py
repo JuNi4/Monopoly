@@ -598,12 +598,50 @@ class monopoly():
             rows[1] += " " + deco + Color2 + symbol*border + color.r + bColor + streeto.name + fColor + fillstr + Color2 + symbol*border + deco
             # blank row
             rows[2] += " " + deco + Color2 + symbol2*width_of_card + deco
-            # Rent: 100
+            # get street data from ower
+            sOwner,index = self.getStreetOwner(streeto.id)
+            if sOwner == None:
+                current_rent = 0
+            else:
+                current_rent = sOwner.streets[index]["current_rent"]
+            # Rent: first rent line
             text = "Rent"
-            rent = str(streeto.rent[0])
+            rent = str(current_rent)
             length = mid-len(text + rent)
             rows[3] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
-
+            # in case of street
+            if streeto.type == "street":
+                # rent with one house
+                text = "Default"
+                rent = str(streeto.rent[0])
+                length = mid-len(text + rent)
+                rows[4] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                # rent with one house
+                text = "1 House"
+                rent = str(streeto.rent[1])
+                length = mid-len(text + rent)
+                rows[5] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                # rent with 2 house
+                text = "2 Houses"
+                rent = str(streeto.rent[2])
+                length = mid-len(text + rent)
+                rows[6] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                # rent with 3 house
+                text = "3 Houses"
+                rent = str(streeto.rent[3])
+                length = mid-len(text + rent)
+                rows[7] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                # rent with 4 house
+                text = "4 Houses"
+                rent = str(streeto.rent[4])
+                length = mid-len(text + rent)
+                rows[8] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                # rent with one hotel
+                text = "1 Hotel"
+                rent = str(streeto.rent[5])
+                length = mid-len(text + rent)
+                rows[9] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                
 
         # print all rows
         for o in rows:
@@ -625,7 +663,6 @@ class monopoly():
     # if a double is rolled again, same thing.
     # if a double is rolled for the third time, a -1 is returned to indicate that the player may now go to jail
     def rollDice(self):
-        return -1
         moves = 0
         # roll two d6 dices
         result = self.dice()
