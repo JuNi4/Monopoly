@@ -389,7 +389,7 @@ while True:
                     input()
                 continue
             # buy street
-            player.buyStreet(street.id, game.streets["streets"])
+            game.buyStreet(player,street.id, game.streets["streets"])
             
             if player.is_ai:
                 print(f"You bought {street.name} for {street.cost}.")
