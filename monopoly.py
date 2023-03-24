@@ -836,6 +836,7 @@ class monopoly():
         if streeto.type in ["street","facility"]:
             # check if it is owned by another player
             if streetOwner != None and streetOwner.id != p.id:
+                # check if player has enough money
                 # pay player rent
                 self.pay(p, streetOwner, streetOwner.streets[index]["current_rent"])
                 return [{"type":"pay_rent","amount":streetOwner.streets[index]["current_rent"],"msg":f"Payed {streetOwner.streets[index]['current_rent']} in rent to {streetOwner.name}"}]
