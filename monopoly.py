@@ -576,7 +576,7 @@ class monopoly():
                 length = mid-len(text + rent)
                 rows[7] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
                 # blank rows
-                for i in range(8,14):
+                for i in range(8,15):
                     rows[i] += " " + deco + Color2 + symbol2*width_of_card + deco
 
         # print all rows
@@ -926,3 +926,6 @@ class monopoly():
         self.totalPlayers = self.playerCount + self.aiCount
         # remove player from active list
         self.players["player_data"].pop(p.id)
+
+    def ai(self, p:player,options:list):
+        pass

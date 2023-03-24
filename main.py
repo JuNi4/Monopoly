@@ -318,6 +318,12 @@ while True:
             index -= 1
             continue
 
+    # make ai only choose each option once
+    if player.is_ai:
+        ai_options = []
+        for i in range(len(result)):
+            ai_options.append(i)
+
     while done:
         os.system("clear")
         # print turn data
@@ -403,7 +409,9 @@ while True:
                 continue
         else:
             time.sleep(1)
-            x = random.randrange(0,len(result)-1)
+            ind = random.randrange(0,len(ai_options)-1)
+            x = ai_options[ind]
+            ai_options.pop(ind)
             print(">"+str(x))
         
         # check if input is out of range
