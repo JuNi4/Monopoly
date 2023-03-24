@@ -693,7 +693,7 @@ class monopoly():
             "current_rent": s.rent[0]
         }
         # check if the player owns all streets of the same color and if so double rent for all of them
-        if self.hasPlayerAllOfColor(s.color_id):
+        if self.hasPlayerAllOfColor(p,s.color_id):
             userAddedStreetData["current_rent"] *= 2
         # go through all streets of the player
         for o in p.streets:
@@ -724,7 +724,7 @@ class monopoly():
             print("You do not have enough houses to upgrade to a hotel.")
             return
         # check if player owns all streets with the same color
-        if not self.hasPlayerAllOfColor(s.color_id):
+        if not self.hasPlayerAllOfColor(p,s.color_id):
             print("You can't buy a hous because you don't have all streets of the same color.")
             return
         # check if player has enough money
@@ -757,7 +757,7 @@ class monopoly():
             print(f"You do not own the {s.type} {s.name}.")
             return
         # check if player owns all streets with the same color
-        if not self.hasPlayerAllOfColor(s.color_id):
+        if not self.hasPlayerAllOfColor(p,s.color_id):
             print("You can't buy a hous because you don't have all streets of the same color.")
             return
         # check if player has enough money
