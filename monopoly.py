@@ -1,5 +1,5 @@
 # Monopolie in python
-import os, sys, random, color, json
+import os, sys, random, color, json, math
 
 # get path to current file
 PATH = os.path.dirname(os.path.abspath(__file__))
@@ -24,6 +24,7 @@ class street:
         elif street_json["type"] == "facility":
             required.append("cost")
             required.append("rent")
+            required.append("color_id")
         elif street_json["type"] == "start":
             required.append("salery")
         # check if json object has requiered keys
@@ -49,34 +50,9 @@ class street:
         elif street_json["type"] == "facility":
             self.cost = street_json["cost"]
             self.rent = street_json["rent"]
+            self.color_id = street_json["color_id"]
         elif street_json["type"] == "start":
             self.salery = street_json["salery"]
-
-# a function to get a street by id not by index
-def getStreetByID(street_list:list,id:int):
-    # get length of list
-    length = len(street_list)
-    # go through all objects in list
-    for i in range(length):
-        # check if id of street matches target id
-        if street_list[i]["id"] == id:
-            # create street object
-            streeto = street(i,street_list[i])
-            # return street object
-            return streeto
-
-# a function to get a street by id not by index
-def getStreetByType(street_list:list,type:str):
-    # get length of list
-    length = len(street_list)
-    # go through all objects in list
-    for i in range(length):
-        # check if id of street matches target id
-        if street_list[i]["type"] == type:
-            # create street object
-            streeto = street(i,street_list[i])
-            # return street object
-            return streeto
 
 # A player object
 class player():
@@ -162,79 +138,6 @@ class player():
         self.position = self.jail_position
         # set time the player spends in jail
         self.prison_time = t
-
-    def buyStreet(self, id:int, street_list:list):
-        # get data of the street
-        street = getStreetByID(street_list,id)
-        # if street is not buyable, tell the player
-        if not street.type in ["facility","street"]:
-            print("Field is not buyable.")
-            return
-        # check if player is able to afford street
-        if self.currency < street.cost:
-            print(f"Player can't afford {street.name}!")
-            return
-        # the json dict of the date for the street attached to the user
-        userAddedStreetData = {
-            "id": street.id,
-            "houses": 0,
-            "hotels": 0,
-            "current_rent": street.rent[0]
-        }
-        # add data to player
-        self.streets.append(userAddedStreetData)
-        # remove player money
-        self.currency -= street.cost
-
-    def buyHotel(self,id:int, hotel_limit:int=1,house_requirement:int=4,rm_houses:bool=True):
-        # check if player owns street
-        index = -1
-        for i in range(len(self.streets)):
-            if self.streets[i].id == id:
-                index = i
-        # check if plyer owns street
-        if index == -1:
-            print(f"You do not own the {street.type} {street.name}.")
-            return
-        # check if player has enough houses to upgrade hotel
-        if not self.street[index]["houses"] >= house_requirement:
-            print("You do not have enough houses to upgrade to a hotel.")
-            return
-        # check if player has enough money
-        if street.hotel_cost > self.currency:
-            print(f"Can not afford hotel for {street.name}")
-        # check if player already has to many hotels
-        if self.streets[index]["hotels"] >= hotel_limit:
-            print(f"Can not buy more hotels than {hotel_limit}.")
-            return
-        # buy hotel
-        self.streets[index]["hotels"] += 1
-        # remove money from player
-        self.currency -= street.hotel_cost
-        if rm_houses:
-            self.streets[index]["houses"] -= house_requirement
-
-    def buyHouse(self,id:int, house_limit:int=1,hotel_limit=1):
-        # check if player owns street
-        index = -1
-        for i in range(len(self.streets)):
-            if self.streets[i].id == id:
-                index = i
-        # check if plyer owns street
-        if index == -1:
-            print(f"You do not own the {street.type} {street.name}.")
-            return
-        # check if player has enough money
-        if street.hotel_cost > self.currency:
-            print(f"Can not afford house for {street.name}")
-        # check if player already has to many hotels
-        if self.streets[index]["houses"] >= hotel_limit:
-            print(f"Can not buy more houses than {house_limit}.")
-            return
-        # buy hotel
-        self.streets[index]["houses"] += 1
-        # remove money from player
-        self.currency -= street.hotel_cost
         
     # convert the player object to a json object
     def dump(self):
@@ -292,7 +195,7 @@ class monopoly():
     # Init function for the monopoly object
     def __init__(self, name_list:list, ai_list:list, colors:list = [], dataName:str = "test"):
         # check if name list has at least 1 person in it
-        if len(name_list)+len(ai_list) < 1:
+        if len(name_list)+len(ai_list) < 2:
             print("There must be at least two people (players + ai) playing!")
             exit(0)
         # set data file suffix
@@ -337,20 +240,17 @@ class monopoly():
         self.chance_cards = self.streets["chance"]
 
         # index all the street color ids
-        self.color_index = []
+        self.color_index = {}
 
         for i in range(0,40):
             count = 0
-            data = {"id": i}
             # go over all streets and get theire id
             for o in self.streets["streets"]:
                 if o["type"] == "street":
                     if o["color_id"] == i:
                         count += 1
-            # add count to data
-            data["count"] = count
             # add data to index
-            self.color_index.append(data)
+            self.color_index[str(i)] = count
 
         # Initialise player object
         self.players = {
@@ -567,7 +467,7 @@ class monopoly():
         mid = width_of_card - border*2
         
         rows = []
-        for i in range(10):
+        for i in range(15):
             rows.append("")
         symbol = "▀"
         symbol2 = "█"
@@ -588,16 +488,23 @@ class monopoly():
             bColor2 = color.lbrgb(streeto.color2)
             Color2 = fColor2+bColor2
             # name length
-            lname = len(streeto.name)
-            fill = mid-lname
-            fillstr = symbol2*fill
+            lname = mid - len(streeto.name)
+            fill = lname / 2
+            fa = symbol2 * int(fill)
+            fb = symbol2 * math.ceil(fill)
             # first row
             rows[0] += " " + deco + Color2 + symbol*border + bColor + symbol*mid + Color2 + symbol*border + deco
             #color row
             #rows[1] += " " + deco + Color2 + symbol*border + fColor + symbol*mid + Color2 + symbol*border + deco
-            rows[1] += " " + deco + Color2 + symbol*border + color.r + bColor + streeto.name + fColor + fillstr + Color2 + symbol*border + deco
+            rows[1] += " " + deco + Color2 + symbol*border + fColor + fa + color.r + bColor + streeto.name + fColor + fb + Color2 + symbol*border + deco
+            # a row for the cost
+            length = mid - len(str(streeto.cost) + self.currencySymbol)
+            length /= 2
+            la = int(length)
+            lb = math.ceil(length)
+            rows[2] += " " + deco + Color2 + symbol2*border + fColor + symbol2*la + color.r + bColor + str(streeto.cost) + self.currencySymbol + fColor + symbol2*lb + Color2 + symbol2*border + deco
             # blank row
-            rows[2] += " " + deco + Color2 + symbol2*width_of_card + deco
+            rows[3] += " " + deco + Color2 + symbol2*width_of_card + deco
             # get street data from ower
             sOwner,index = self.getStreetOwner(streeto.id)
             if sOwner == None:
@@ -606,42 +513,58 @@ class monopoly():
                 current_rent = sOwner.streets[index]["current_rent"]
             # Rent: first rent line
             text = "Rent"
-            rent = str(current_rent)
+            rent = str(current_rent) + self.currencySymbol
             length = mid-len(text + rent)
-            rows[3] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+            rows[4] += " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
             # in case of street
             if streeto.type == "street":
                 # rent with one house
                 text = "Default"
-                rent = str(streeto.rent[0])
-                length = mid-len(text + rent)
-                rows[4] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
-                # rent with one house
-                text = "1 House"
-                rent = str(streeto.rent[1])
+                rent = str(streeto.rent[0]) + self.currencySymbol
                 length = mid-len(text + rent)
                 rows[5] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
-                # rent with 2 house
-                text = "2 Houses"
-                rent = str(streeto.rent[2])
+                # rent with one house
+                text = "1 House"
+                rent = str(streeto.rent[1]) + self.currencySymbol
                 length = mid-len(text + rent)
                 rows[6] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
-                # rent with 3 house
-                text = "3 Houses"
-                rent = str(streeto.rent[3])
+                # rent with 2 house
+                text = "2 Houses"
+                rent = str(streeto.rent[2]) + self.currencySymbol
                 length = mid-len(text + rent)
                 rows[7] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
-                # rent with 4 house
-                text = "4 Houses"
-                rent = str(streeto.rent[4])
+                # rent with 3 house
+                text = "3 Houses"
+                rent = str(streeto.rent[3]) + self.currencySymbol
                 length = mid-len(text + rent)
                 rows[8] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
-                # rent with one hotel
-                text = "1 Hotel"
-                rent = str(streeto.rent[5])
+                # rent with 4 house
+                text = "4 Houses"
+                rent = str(streeto.rent[4]) + self.currencySymbol
                 length = mid-len(text + rent)
                 rows[9] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
-                
+                # rent with one hotel
+                text = "Hotel"
+                rent = str(streeto.rent[5]) + self.currencySymbol
+                length = mid-len(text + rent)
+                rows[10] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                # blank row
+                rows[11] += " " + deco + Color2 + symbol2*width_of_card + deco
+                # cost house
+                text = "Cost House"
+                cost = str(streeto.house_cost) + self.currencySymbol
+                length = mid-len(text + cost)
+                rows[12] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + cost + Color2 + symbol2*border + deco
+                # cost hotel
+                text = "Cost Hotel"
+                cost = str(streeto.hotel_cost) + self.currencySymbol
+                length = mid-len(text + cost)
+                rows[13] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + cost + Color2 + symbol2*border + deco
+                # blank row
+                rows[14] += " " + deco + Color2 + symbol2*width_of_card + deco
+            elif streeto.type == "facility":
+                for i in range(5,14):
+                    rows[i] += " " + deco + Color2 + symbol2*width_of_card + deco
 
         # print all rows
         for o in rows:
@@ -734,8 +657,124 @@ class monopoly():
         return pa
     
     # checks if a player has all streets of a color
-    def hasPlayerAllOfColor(self,p:player,id:int):
-        pass
+    def hasPlayerAllOfColor(self,p:player,color_id:int):
+        # get count of the specified color
+        color_count = self.color_index[str(color_id)]
+        # variable to hold the amount of streets the player
+        count = 0
+        # count the amount of streets with the target color
+        for o in p.streets:
+            # check if color_id is in o
+            if "color_id" in o:
+                # check if color_id of street is same as the one were looking for
+                if o["color_id"] == color_id:
+                    # increment counter
+                    count += 1
+                
+        # check if player has all streets
+        return count == color_count
+    
+    def buyStreet(self, p:player,id:int):
+        # get data of the street
+        s = self.getStreetByID(id)
+        # if street is not buyable, tell the player
+        if not s.type in ["facility","street"]:
+            print("Field is not buyable.")
+            return
+        # check if player is able to afford street
+        if p.currency < s.cost:
+            print(f"Player can't afford {s.name}!")
+            return
+        # the json dict of the date for the street attached to the user
+        userAddedStreetData = {
+            "id": s.id,
+            "houses": 0,
+            "hotels": 0,
+            "current_rent": s.rent[0]
+        }
+        # check if the player owns all streets of the same color and if so double rent for all of them
+        if self.hasPlayerAllOfColor(s.color_id):
+            userAddedStreetData["current_rent"] *= 2
+        # go through all streets of the player
+        for o in p.streets:
+            if "color_id" in o:
+                if o["color_id"] == s.color_id:
+                    # if it has the same color, double rent
+                    o["current_rent"] *= 2
+        # add data to player
+        p.streets.append(userAddedStreetData)
+        # remove player money
+        p.currency -= s.cost
+        # update the player
+        self.updatePlayer(p)
+
+    def buyHotel(self, p:player,id:int, hotel_limit:int=1,house_requirement:int=4,rm_houses:bool=True):
+        s = self.getStreetByID(id)
+        # check if player owns street
+        index = -1
+        for i in range(len(self.streets)):
+            if p.streets[i].id == id:
+                index = i
+        # check if plyer owns street
+        if index == -1:
+            print(f"You do not own the {s.type} {s.name}.")
+            return
+        # check if player has enough houses to upgrade hotel
+        if not p.streets[index]["houses"] >= house_requirement:
+            print("You do not have enough houses to upgrade to a hotel.")
+            return
+        # check if player owns all streets with the same color
+        if not self.hasPlayerAllOfColor(s.color_id):
+            print("You can't buy a hous because you don't have all streets of the same color.")
+            return
+        # check if player has enough money
+        if street.hotel_cost > p.currency:
+            print(f"Can not afford hotel for {s.name}")
+        # check if player already has to many hotels
+        if p.streets[index]["hotels"] >= hotel_limit:
+            print(f"Can not buy more hotels than {hotel_limit}.")
+            return
+        # buy hotel
+        p.streets[index]["hotels"] += 1
+        # increase rent
+        p.streets[index]["current_rent"] = s.rent[5]
+        # remove money from player
+        p.currency -= s.hotel_cost
+        if rm_houses:
+            p.streets[index]["houses"] -= house_requirement
+        # update the player
+        self.updatePlayer(p)
+
+    def buyHouse(self, p:player,id:int, house_limit:int=1,hotel_limit=1):
+        s = self.getStreetByID(id)
+        # check if player owns street
+        index = -1
+        for i in range(len(self.streets)):
+            if p.streets[i].id == id:
+                index = i
+        # check if plyer owns street
+        if index == -1:
+            print(f"You do not own the {s.type} {s.name}.")
+            return
+        # check if player owns all streets with the same color
+        if not self.hasPlayerAllOfColor(s.color_id):
+            print("You can't buy a hous because you don't have all streets of the same color.")
+            return
+        # check if player has enough money
+        if street.hotel_cost > p.currency:
+            print(f"Can not afford house for {s.name}")
+        # check if player already has to many hotels
+        if p.streets[index]["houses"] >= hotel_limit:
+            print(f"Can not buy more houses than {house_limit}.")
+            return
+        # buy hotel
+        p.streets[index]["houses"] += 1
+        # increase rent
+        p.streets[index]["current_rent"] = s.rent[p.streets[index]["houses"]]
+        # remove money from player
+        p.currency -= s.hotel_cost
+        # update the player
+        self.updatePlayer(p)
 
     ##
     # converts a string to instruction
@@ -832,27 +871,35 @@ class monopoly():
         streeto = self.getStreetByID(p.position)
         # get street owner
         streetOwner, index = self.getStreetOwner(streeto.id)
+        # return var
+        out = []
         # check if field is street
         if streeto.type in ["street","facility"]:
-            # check if it is owned by another player
-            if streetOwner != None and streetOwner.id != p.id:
-                # check if player has enough money
-                # pay player rent
-                self.pay(p, streetOwner, streetOwner.streets[index]["current_rent"])
-                return [{"type":"pay_rent","amount":streetOwner.streets[index]["current_rent"],"msg":f"Payed {streetOwner.streets[index]['current_rent']} in rent to {streetOwner.name}"}]
             # check if no one owns the street
             if streetOwner == None:
-                return [{"type":"offer_street","id":streeto.id}]
+                out.append({"type":"offer_street","id":streeto.id})
+            # check if it is owned by another player
+            elif streetOwner != None and streetOwner.id != p.id:
+                # check if player has enough money
+                if p.currency > streetOwner.streets[index]["current_rent"]:
+                    # pay player rent
+                    self.pay(p, streetOwner, streetOwner.streets[index]["current_rent"])
+                    out.append({"type":"pay_rent","amount":streetOwner.streets[index]["current_rent"],"msg":f"Payed {streetOwner.streets[index]['current_rent']} in rent to {streetOwner.name}"})
+                else:
+                    self.gameOver(p)
+                    out.append({"type":"game_over","msg":"You can't pay your rent. You have lost the game."})
             # check if player owns street
-            if streetOwner.id == p.id:
-                pass
+            elif streetOwner != None and streetOwner.id == p.id:
+                out.append({"type":"offer_house","id":streeto.id,"cost":streeto.house_cost})
+                out.append({"type":"offer_hotel","id":streeto.id,"cost":streeto.hotel_cost})
         else:
-            return []
-        self.updatePlayer(p)
+            return out
+        #self.updatePlayer(p)
         # compile the action
         #x = self.__compile_action("move_8|goto_jail|no_salery",[0,0], "demo")
         # execute the compiled action
         #self.__execute_action(x,p)
+        return out
 
     def gameOver(self,p:player):
         # add player to lost player list

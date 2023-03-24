@@ -1,11 +1,11 @@
 import monopoly as mon, time, color, random, os, linecache
 import itertools
 # Todo:
+# make rent go up when player owns all street of one color
 # make houses buyable
 # same for hotels
 # finish card display
-# add detection for having all cards of one color
-# add winning and gameover mechanics
+# add chance and community cards
 
 # get path to current file
 PATH = os.path.dirname(os.path.abspath(__file__))
@@ -116,10 +116,33 @@ time.sleep(2)
 ## Main Game Logic ##
 #####################
 
-index = 0
+index = -1
 turn = 1
 
 while True:
+    # check if only one player is remaining
+    if len(game.players["player_data"]) < 2:
+        print(f"Congratulations {game.getPlayer(0).name}, you have won the game!")
+        print("Press <ENTER> to exit.")
+        input()
+        break
+    # Increment index
+    index += 1
+    if index == len(game.players["player_data"]):
+        index = 0
+        # clear the screen
+        os.system("clear")
+        # print turn data
+        print(color.rgb(0,0,0)+f"Turn: {turn}")
+        # draw the map of the current state
+        print(color.r+"Updated state of the map:")
+        # draw map
+        game.drawMap()
+        # increment turn counter
+        turn += 1
+        # wait
+        time.sleep(5)
+
     os.system("clear")
     # print turn data
     print(color.rgb(0,0,0)+f"Turn: {turn} Player:{index+1}/{game.totalPlayers}")
@@ -155,22 +178,6 @@ while True:
                 time.sleep(1)
             # make player go to jail
             player.arrest()
-            # Increment index
-            index += 1
-            if index == len(game.players["player_data"]):
-                index = 0
-                # clear the screen
-                os.system("clear")
-                # print turn data
-                print(color.rgb(0,0,0)+f"Turn: {turn}")
-                # draw the map of the current state
-                print(color.r+"Updated state of the map:")
-                # draw map
-                game.drawMap()
-                # increment turn counter
-                turn += 1
-                # wait
-                time.sleep(5)
             game.updatePlayer(player)
             continue
         # otherwise move player by y amount and anounce the result
@@ -206,22 +213,6 @@ while True:
             else:
                 print(color.r+"Your time in jail is now over. you will be able to make a move next turn! Press <ENTER> to continue.")
                 input()
-            # Increment index
-            index += 1
-            if index == len(game.players["player_data"]):
-                index = 0
-                # clear the screen
-                os.system("clear")
-                # print turn data
-                print(color.rgb(0,0,0)+f"Turn: {turn}")
-                # draw the map of the current state
-                print(color.r+"Updated state of the map:")
-                # draw map
-                game.drawMap()
-                # increment turn counter
-                turn += 1
-                # wait
-                time.sleep(5)
             game.updatePlayer(player)
             continue
         # if the player has not waited long enough
@@ -247,22 +238,6 @@ while True:
             else:
                 print(color.r+f"You didnt roll a double. You need to wait {player.prison_time} more turns. Press <ENTER> to continue.")
                 input()
-            # increment player index
-            index += 1
-            if index == len(game.players["player_data"]):
-                index = 0
-                # clear the screen
-                os.system("clear")
-                # print turn data
-                print(color.rgb(0,0,0)+f"Turn: {turn}")
-                # draw the map of the current state
-                print(color.r+"Updated state of the map:")
-                # draw map
-                game.drawMap()
-                # increment turn counter
-                turn += 1
-                # wait
-                time.sleep(5)
             game.updatePlayer(player)
             continue
     # update player
@@ -308,6 +283,19 @@ while True:
                 input()
 
             result.pop(0)
+        
+        if result[0]["type"] == "game_over":
+            # tell the player that he payed rent to a player
+            if player.is_ai:
+                print(color.r + result[0]["msg"])
+                time.sleep(1)
+            else:
+                print(color.r + result[0]["msg"]+" Press <ENTER> to continue.")
+                input()
+
+            result.pop(0)
+            index -= 1
+            continue
 
     while done:
         os.system("clear")
@@ -386,6 +374,8 @@ while True:
             game.gameOver(player)
             # make sure no errors appear
             index -= 1
+            # set done to false so the programm wil jump back to the beginning of the loop
+            done = False
             # break out of loop
             break
         elif result[x]["type"] == "offer_street":
@@ -409,27 +399,11 @@ while True:
                 input()
             continue
 
-
+    # if not done: continue
+    if not done:
+        continue
+    # update the player
     game.updatePlayer(player)
-
-
-
-    # Increment index
-    index += 1
-    if index == len(game.players["player_data"]):
-        index = 0
-        # clear the screen
-        os.system("clear")
-        # print turn data
-        print(color.rgb(0,0,0)+f"Turn: {turn}")
-        # draw the map of the current state
-        print(color.r+"Updated state of the map:")
-        # draw map
-        game.drawMap()
-        # increment turn counter
-        turn += 1
-        # wait
-        time.sleep(5)
 
 
 
