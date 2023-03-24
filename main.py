@@ -113,8 +113,11 @@ game = mon.monopoly(players, AIs, player_colors)
 print("The current state of the game")
 game.drawMap()
 
-print("Press <ENTER> to continue.")
-input()
+if game.getPlayer(0).type == "human":
+    print("Press <ENTER> to continue.")
+    input()
+else:
+    time.sleep(ai_wait_time)
 
 #####################
 ## Main Game Logic ##
@@ -145,8 +148,11 @@ while True:
         # increment turn counter
         turn += 1
         # wait
-        print("Press <ENTER> to continue.")
-        input()
+        if game.getPlayer(0).type == "human":
+            print("Press <ENTER> to continue.")
+            input()
+        else:
+            time.sleep(ai_wait_time)
 
     os.system("clear")
     # print turn data
