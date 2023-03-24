@@ -563,7 +563,20 @@ class monopoly():
                 # blank row
                 rows[14] += " " + deco + Color2 + symbol2*width_of_card + deco
             elif streeto.type == "facility":
-                for i in range(5,14):
+                # blank row
+                rows[5] += " " + deco + Color2 + symbol2*width_of_card + deco
+                # rent with 4 house
+                text = "Default"
+                rent = str(streeto.rent[0]) + self.currencySymbol
+                length = mid-len(text + rent)
+                rows[6] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                # rent with 4 house
+                text = "2 Facilitys"
+                rent = str(streeto.rent[0]*2) + self.currencySymbol
+                length = mid-len(text + rent)
+                rows[7] = " " + deco + Color2 + symbol2*border + color.r + bColor2 + text + Color2 + symbol2*length + rent + Color2 + symbol2*border + deco
+                # blank rows
+                for i in range(8,14):
                     rows[i] += " " + deco + Color2 + symbol2*width_of_card + deco
 
         # print all rows
