@@ -5,6 +5,7 @@ import itertools
 # same for hotels
 # finish card display
 # add detection for having all cards of one color
+# add winning and gameover mechanics
 
 # get path to current file
 PATH = os.path.dirname(os.path.abspath(__file__))
