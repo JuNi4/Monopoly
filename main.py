@@ -10,6 +10,9 @@ import itertools
 # get path to current file
 PATH = os.path.dirname(os.path.abspath(__file__))
 
+# the time the ai waits befor continuing
+ai_wait_time:float = 2
+
 ###############
 ## Functions ##
 ###############
@@ -110,7 +113,8 @@ game = mon.monopoly(players, AIs, player_colors)
 print("The current state of the game")
 game.drawMap()
 
-time.sleep(2)
+print("Press <ENTER> to continue.")
+input()
 
 #####################
 ## Main Game Logic ##
@@ -141,7 +145,8 @@ while True:
         # increment turn counter
         turn += 1
         # wait
-        time.sleep(5)
+        print("Press <ENTER> to continue.")
+        input()
 
     os.system("clear")
     # print turn data
@@ -159,8 +164,7 @@ while True:
     if not player.is_ai:
         input()
     else:
-        time.sleep(0.5)
-    time.sleep(0.25)
+        time.sleep(ai_wait_time)
     # if the player is not in jail
     if not player.in_prison:
         # roll a dice
@@ -175,7 +179,7 @@ while True:
             if not player.is_ai:
                 input()
             else:
-                time.sleep(1)
+                time.sleep(ai_wait_time)
             # make player go to jail
             player.arrest()
             game.updatePlayer(player)
@@ -189,14 +193,14 @@ while True:
         if not player.is_ai:
             input()
         else:
-            time.sleep(1)
+            time.sleep(ai_wait_time)
 
         # move the player
         x = player.move(y)
         if x == 1:
             print(color.r+f"You went over GO and collected {game.salery}{game.currencySymbol}.")
             player.giveCurrency(game.salery)
-            time.sleep(1)
+            time.sleep(ai_wait_time)
     # if the player is in jail
     else:
         # chech prison time
@@ -209,7 +213,7 @@ while True:
             # inform the player
             if player.is_ai:
                 print(color.r+"Your time in jail is now over. you will be able to make a move next turn!")
-                time.sleep(1)
+                time.sleep(ai_wait_time)
             else:
                 print(color.r+"Your time in jail is now over. you will be able to make a move next turn! Press <ENTER> to continue.")
                 input()
@@ -223,7 +227,7 @@ while True:
             # a double is rolled
             if player.is_ai:
                 print(color.r+"You rolled a double! You get out of jail.")
-                time.sleep(1)
+                time.sleep(ai_wait_time)
             else:
                 print(color.r+"You rolled a double! You get out of jail. Press <ENTER> to continue.")
                 input()
@@ -234,7 +238,7 @@ while True:
             # inform the player how long to wait
             if player.is_ai:
                 print(color.r+f"You didnt roll a double. You need to wait {player.prison_time} more turns.")
-                time.sleep(1)
+                time.sleep(ai_wait_time)
             else:
                 print(color.r+f"You didnt roll a double. You need to wait {player.prison_time} more turns. Press <ENTER> to continue.")
                 input()
@@ -277,7 +281,7 @@ while True:
             # tell the player that he payed rent to a player
             if player.is_ai:
                 print(color.r + result[0]["msg"])
-                time.sleep(1)
+                time.sleep(ai_wait_time)
             else:
                 print(color.r + result[0]["msg"]+" Press <ENTER> to continue.")
                 input()
@@ -288,7 +292,7 @@ while True:
             # tell the player that he payed rent to a player
             if player.is_ai:
                 print(color.r + result[0]["msg"])
-                time.sleep(1)
+                time.sleep(ai_wait_time)
             else:
                 print(color.r + result[0]["msg"]+" Press <ENTER> to continue.")
                 input()
@@ -356,7 +360,7 @@ while True:
         if result[x]["type"] == "end_turn":
             if player.is_ai:
                 print("End of your turn.")
-                time.sleep(1)
+                time.sleep(ai_wait_time)
             else:
                 print("End of your turn. Press <ENTER> to continue.")
                 input()
@@ -366,7 +370,7 @@ while True:
             if player.is_ai:
                 print("You declared bankrupcy and are now game over.")
                 # wait a moment for him to read
-                time.sleep(1)
+                time.sleep(ai_wait_time)
             else:
                 print("You declared bankrupcy and are now game over. Press <ENTER> to continue.")
                 input()
@@ -383,7 +387,7 @@ while True:
             if not game.getStreetOwner(street.id)[0] == None:
                 if player.is_ai:
                     print("Someone already owns this street.")
-                    time.sleep(1)
+                    time.sleep(ai_wait_time)
                 else:
                     print("Someone already owns this street. Press <ENTER> to continue")
                     input()
@@ -393,7 +397,7 @@ while True:
             
             if player.is_ai:
                 print(f"You bought {street.name} for {street.cost}.")
-                time.sleep(1)
+                time.sleep(ai_wait_time)
             else:
                 print(f"You bought {street.name} for {street.cost}. Press <ENTER> to continue.")
                 input()
