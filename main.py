@@ -110,11 +110,11 @@ for i in range(num_ais):
 game = mon.monopoly(players, AIs, player_colors)
 
 # display the state of the game
-print("The current state of the game")
+print(color.r+"The current state of the game")
 game.drawMap()
 
 if game.getPlayer(0).type == "human":
-    print("Press <ENTER> to continue.")
+    print(color.r+"Press <ENTER> to continue.")
     input()
 else:
     time.sleep(ai_wait_time)
@@ -149,7 +149,7 @@ while True:
         turn += 1
         # wait
         if game.getPlayer(0).type == "human":
-            print("Press <ENTER> to continue.")
+            print(color.r+"Press <ENTER> to continue.")
             input()
         else:
             time.sleep(ai_wait_time)
