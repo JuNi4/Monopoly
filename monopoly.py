@@ -124,7 +124,7 @@ class player():
         # check if position is out of bounds
         if self.position < 0: self.position = 0
         if self.position >= self.field_count:
-            self.position = 0
+            self.position -= self.field_count
             # indicate that player went over start
             code = 1
 
@@ -902,7 +902,7 @@ class monopoly():
                     self.gameOver(p)
                     out.append({"type":"game_over","msg":"You can't pay your rent. You have lost the game."})
             # check if player owns street
-            elif streetOwner != None and streetOwner.id == p.id:
+            elif streetOwner != None and streeto.type == "street" and streetOwner.id == p.id:
                 out.append({"type":"offer_house","id":streeto.id,"cost":streeto.house_cost})
                 out.append({"type":"offer_hotel","id":streeto.id,"cost":streeto.hotel_cost})
         else:
