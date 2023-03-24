@@ -149,6 +149,23 @@ while True:
                 time.sleep(1)
             # make player go to jail
             player.arrest()
+            # Increment index
+            index += 1
+            if index == len(game.players["player_data"]):
+                index = 0
+                # clear the screen
+                os.system("clear")
+                # print turn data
+                print(color.rgb(0,0,0)+f"Turn: {turn}")
+                # draw the map of the current state
+                print(color.r+"Updated state of the map:")
+                # draw map
+                game.drawMap()
+                # increment turn counter
+                turn += 1
+                # wait
+                time.sleep(5)
+            game.updatePlayer(player)
             continue
         # otherwise move player by y amount and anounce the result
         if player.is_human:
@@ -183,6 +200,23 @@ while True:
             else:
                 print(color.r+"Your time in jail is now over. you will be able to make a move next turn! Press <ENTER> to continue.")
                 input()
+            # Increment index
+            index += 1
+            if index == len(game.players["player_data"]):
+                index = 0
+                # clear the screen
+                os.system("clear")
+                # print turn data
+                print(color.rgb(0,0,0)+f"Turn: {turn}")
+                # draw the map of the current state
+                print(color.r+"Updated state of the map:")
+                # draw map
+                game.drawMap()
+                # increment turn counter
+                turn += 1
+                # wait
+                time.sleep(5)
+            game.updatePlayer(player)
             continue
         # if the player has not waited long enough
         # roll 2 dices and see if it is a double
@@ -207,6 +241,24 @@ while True:
             else:
                 print(color.r+f"You didnt roll a double. You need to wait {player.prison_time} turns. Press <ENTER> to continue.")
                 input()
+            # increment player index
+            index += 1
+            if index == len(game.players["player_data"]):
+                index = 0
+                # clear the screen
+                os.system("clear")
+                # print turn data
+                print(color.rgb(0,0,0)+f"Turn: {turn}")
+                # draw the map of the current state
+                print(color.r+"Updated state of the map:")
+                # draw map
+                game.drawMap()
+                # increment turn counter
+                turn += 1
+                # wait
+                time.sleep(5)
+            game.updatePlayer(player)
+            continue
     # update player
     game.updatePlayer(player)
 
@@ -248,6 +300,8 @@ while True:
             else:
                 print(color.r+result[0]["msg"]+" Press <ENTER> to continue.")
                 input()
+
+            result.pop(0)
 
     while done:
         os.system("clear")

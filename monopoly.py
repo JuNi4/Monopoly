@@ -161,7 +161,7 @@ class player():
         # set the position to the jail position
         self.position = self.jail_position
         # set time the player spends in jail
-        self.jail_time = t
+        self.prison_time = t
 
     def buyStreet(self, id:int, street_list:list):
         # get data of the street
@@ -335,7 +335,7 @@ class monopoly():
             count = 0
             data = {"id": i}
             # go over all streets and get theire id
-            for o in self.streets["street"]:
+            for o in self.streets["streets"]:
                 if o["type"] == "street":
                     if o["color_id"] == i:
                         count += 1
@@ -617,6 +617,7 @@ class monopoly():
     # if a double is rolled again, same thing.
     # if a double is rolled for the third time, a -1 is returned to indicate that the player may now go to jail
     def rollDice(self):
+        return -1
         moves = 0
         # roll two d6 dices
         result = self.dice()
@@ -787,7 +788,7 @@ class monopoly():
         # get street owner
         streetOwner, index = self.getStreetOwner(streeto.id)
         # check if field is street
-        if streeto.type == "street":
+        if streeto.type in ["street","facility"]:
             # check if it is owned by another player
             if streetOwner != None and streetOwner.id != p.id:
                 # pay player rent
